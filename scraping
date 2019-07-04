@@ -1,0 +1,28 @@
+from urllib.request import urlopen as uReq
+from bs4 import BeautifulSoup as soup
+import pandas as pd
+my_url="https://www.imdb.com/chart/top?ref_=nv_mv_250"
+uClient = uReq(my_url)
+page_html= uClient.read()
+uClient.close()
+page_soup=soup(page_html,"html.parser")
+containers=page_soup.findAll("td",{"class":"titleColumn"})
+title_container=page_soup.findAll("td",{"class":"posterColumn"})
+rating_container=page_soup.findAll("td",{"class":"ratingColumn imdbRating"})
+filename="movies.csv"
+f= open(filename,"w")
+headers = "cast, movie_title, imdb_rating\n"
+f.write(headers)
+for container in containers:
+    cast=container.a["title"]
+    f.write(cast.replace(",","|") + ",")	
+for container in title_container:
+    movie_title = container.a.img["alt"]  
+    f.write(movie_title + ",") 
+for container in rating_container:
+    imdb_rating = container.strong["title"]
+    f.write(imdb_rating + ",")
+f.write("\n")
+f.close()  
+    
+
